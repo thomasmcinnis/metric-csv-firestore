@@ -16,18 +16,19 @@ This CLI app just takes a csv and adds each row to the `userCreationRequest` col
 You must have a CSV file with the following formatting:
 
 ```txt
-firstName,lastName,organization,email,gender,squads
-Bob,Smith,K1hFmAw79rybBOujEmFM,example@email.com,Male,"[""BgHPOSVNpjYJqNcZTzzK"",""AnotherSquadID""]"
+firstName,lastName,organization,email,gender,dateOfBirth, squads
+Bob,Smith,K1hFmAw79rybBOujEmFM,example@email.com,Male,2007-05-19,"[""BgHPOSVNpjYJqNcZTzzK"",""AnotherSquadID""]"
 ```
 
-> **Note**: Note that the array of squadIDs are contained in quotations, wrapped by double quotes inside the braces, and the comma seperation is also wrapped in quotes. Failure to have the correct quotations will throw a parsing error in the app.
+-   `dateOfBirth` and `squads` columns are optional in the csv
 
+> **Note**: Note that the array of squadIDs are contained in quotations, wrapped by double quotes inside the braces, and the comma seperation is also wrapped in quotes. Failure to have the correct quotations will throw a parsing error in the app.
 
 ## Setting up the app
 
 ### Prerequisites
 
-- Node.js and npm installed.
+-   Node.js and npm installed.
 
 ### Dependencies
 
@@ -40,11 +41,12 @@ npm install
 ### Adding Your serviceAccountKey.json
 
 1. Obtain your `serviceAccountKey.json` from Firebase:
-   - Go to the Firebase Console.
-   - Select Metric VBT project.
-   - Navigate to `Project Settings > Service accounts`.
-   - Click on `Generate new private key`.
-   - This will download the `serviceAccountKey.json`. (You might have to rename it this from a long name.)
+
+    - Go to the Firebase Console.
+    - Select Metric VBT project.
+    - Navigate to `Project Settings > Service accounts`.
+    - Click on `Generate new private key`.
+    - This will download the `serviceAccountKey.json`. (You might have to rename it this from a long name.)
 
 2. Move the downloaded `serviceAccountKey.json` to the root of this project.
 

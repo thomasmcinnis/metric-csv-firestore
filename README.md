@@ -1,58 +1,64 @@
 # Metric CSV Uploader Instructions
 
-This CLI app just takes a csv and adds each row to the `userCreationRequest` collection in Firestore.
+This CLI app takes a csv of athlete details and adds each row to the
+`userCreationRequest` collection in Firestore.
 
-## Setting up the CSV file
+On running, rows from the csv create new athlete records, and create new squads
+for the organisation if they don't currently exist.
 
-### Create required squads in Firestore
+Additionally, invitation emails are turned off by default, so athletes will not
+be notified.
 
-1. Go to the squads collection in Firestore
-2. Filter by the organization ID of the org you are doing the bulk upload for
-3. Add any new squad documents as required
-4. Note the ID string for each squad
+## Format for the CSV file
 
-### Create a CSV
-
-You must have a CSV file with the following formatting:
+An example csv is provided in the root directory. Note the column names.
 
 ```txt
-firstName,lastName,organization,email,gender,dateOfBirth, squads
-Bob,Smith,K1hFmAw79rybBOujEmFM,example@email.com,Male,2007-05-19,"[""BgHPOSVNpjYJqNcZTzzK"",""AnotherSquadID""]"
+firstName,lastName,email,gender,dateOfBirth,squads
+Bob,Smith,example@email.com,Male,2007-05-19,Hockey;Basketball
 ```
 
--   `dateOfBirth` and `squads` columns are optional in the csv
+> [!IMPORTANT]
+>
+> - `dateOfBirth` and `squads` columns are optional and can be left empty
+> - Note the delimetter for squads is semi-colon `;`
+> - Dates must be in format `YYYY-MM-DD`
 
-> **Note**: Note that the array of squadIDs are contained in quotations, wrapped by double quotes inside the braces, and the comma seperation is also wrapped in quotes. Failure to have the correct quotations will throw a parsing error in the app.
-
-## Setting up the app
+## Set up
 
 ### Prerequisites
 
--   Node.js and npm installed.
+- Node.js and npm installed.
 
 ### Dependencies
 
-To install the required dependencies for this project, navigate to the project's root directory in your terminal and run:
+To install the required dependencies for this project, navigate to the project's
+root directory in your terminal and run:
 
 ```bash
 npm install
 ```
 
-### Adding Your serviceAccountKey.json
+### Add your `serviceAccountKey.json`
 
 1. Obtain your `serviceAccountKey.json` from Firebase:
 
-    - Go to the Firebase Console.
-    - Select Metric VBT project.
-    - Navigate to `Project Settings > Service accounts`.
-    - Click on `Generate new private key`.
-    - This will download the `serviceAccountKey.json`. (You might have to rename it this from a long name.)
+   - Go to the Firebase Console.
+   - Select Metric VBT project.
+   - Navigate to `Project Settings > Service accounts`.
+   - Click on `Generate new private key`.
+   - This will download the `serviceAccountKey.json`.
+     (You might have to rename it this from a long name.)
 
 2. Move the downloaded `serviceAccountKey.json` to the root of this project.
 
-> **Note**: This file contains sensitive information. Ensure you do not share it, commit it, or expose it in any public areas.
+> [!CAUTION]
+>
+> This file contains sensitive information. Ensure you do not share it,
+> commit it, or expose it to public access. By default it is already excluded
+> in the .gitignore file.
 
-### Building the App
+### Build the app
 
 To build the application, run:
 
@@ -60,22 +66,35 @@ To build the application, run:
 npx tsc
 ```
 
-This will compile the TypeScript `src` files and place the output in the `dist` directory.
+This will compile the TypeScript files in `./src/` and create an executable
+in the `./dist/` directory.
 
-## Running the App
+## Run the app
 
-To run the, navigate to the project's root directory and execute:
+### Options
+
+The app accepts two required options:
+
+- The filepath to the csv denoted by `-f` or `--file` flag
+- The organisation document id denoted by the `-o` or `--org` flag
+
+### Executing
+
+To run, navigate to the project's root directory and execute:
 
 ```bash
-node dist/upload.js -f path_to_your_csv_file.csv
+node dist/index.js -f path/to/your/csv/file.csv -o the-org-id
 ```
 
-Replace `path_to_your_csv_file.csv` with the path to your actual CSV file.
-
-Assuming you have the file saved in your Documents folder that would be like this:
+Assuming you have the file saved in your Documents folder that would be something
+like this:
 
 ```bash
-node dist/upload.js -f ~/Documents/your-csv-filename.csv
+node dist/index.js -f ~/Documents/your-csv-filename.csv -o fs8l0oHiXpTc9qhefD6c
 ```
 
-It is advisable to watch the `userCreationRequest` collection in Firestore to observe the documents being written and then handled by the Firebase function, and also making random checks of various new users to ensure success.
+> [!NOTE]
+>
+> It is advisable to watch the `userCreationRequest` collection in Firestore to
+> observe the documents being written and then handled by the Firebase function,
+> and also making random checks of various new users to ensure success.

@@ -10,6 +10,7 @@ interface UserData {
   gender: string;
   dateOfBirth?: FirebaseFirestore.Timestamp;
   squads?: string[];
+  sendInvite: boolean;
 }
 
 let db: FirebaseFirestore.Firestore;
@@ -36,7 +37,7 @@ async function getOrCreateSquad(
 ): Promise<string> {
   const squadRef = db
     .collection('squads')
-    .where('organizationId', '==', organizationId)
+    .where('organization', '==', organizationId)
     .where('name', '==', squadName)
     .limit(1);
   const squadSnapshot = await squadRef.get();
@@ -45,7 +46,7 @@ async function getOrCreateSquad(
     // Create new squad
     const squadData = {
       name: squadName,
-      organizationId: organizationId,
+      organization: organizationId,
     };
     const res = await db.collection('squads').add(squadData);
     return res.id;
@@ -72,9 +73,10 @@ export async function uploadCSV(
     const data: UserData = {
       firstName: row.firstName,
       lastName: row.lastName,
-      organization: row.organization,
+      organization: organizationId,
       email: row.email,
       gender: row.gender,
+      sendInvite: false,
     };
 
     if (row.squads) {

@@ -305,6 +305,53 @@ async function main(): Promise<void> {
   console.log(`\nLoaded ${rows.length} rows from ${file}`);
   console.log(`Org: ${org}\n`);
 
+  if (rows.length === 0) {
+    console.error('CSV has no data rows.');
+    process.exit(1);
+  }
+
+  const EXPECTED = ['firstName', 'lastName', 'email', 'gender',
+    'dateOfBirth', 'squads'];
+  const REQUIRED = new Set(['firstName', 'lastName', 'email', 'gender']);
+  const headers = Object.keys(rows[0]);
+  const first = rows[0];
+
+  console.log('— Field mapping (first row) —');
+  for (const field of EXPECTED) {
+    const present = headers.includes(field);
+    const value = present ? String((first as any)[field] ?? '') : '';
+    const required = REQUIRED.has(field);
+    const status = present
+      ? (value.trim() === '' && required ? 'MISSING VALUE' : 'OK')
+      : (required ? 'MISSING COLUMN' : 'optional, absent');
+    const display = value.length > 60 ? value.slice(0, 57) + '...' : value;
+    console.log(`  ${field.padEnd(13)} → ${status.padEnd(15)} ${display}`);
+  }
+  const unexpected = headers.filter((h) => !EXPECTED.includes(h));
+  if (unexpected.length > 0) {
+    console.log(`  Unexpected columns (ignored): ${unexpected.join(', ')}`);
+  }
+  console.log();
+
+  const missingRequired = [...REQUIRED].filter(
+    (f) => !headers.includes(f) || String((first as any)[f] ?? '').trim() === '');
+  if (missingRequired.length > 0) {
+    console.error(`Required field(s) missing/empty on first row: ${missingRequired.join(', ')}`);
+    console.error('Fix the CSV and re-run.');
+    process.exit(1);
+  }
+
+  if (!opts.yes) {
+    const looksRight = await confirm({
+      message: 'Does the field mapping above look correct?',
+      default: true,
+    });
+    if (!looksRight) {
+      console.log('Aborted. Fix the CSV columns and re-run.');
+      process.exit(0);
+    }
+  }
+
   const plan = await buildPlan(org, rows);
 
   if (!opts.yes) {

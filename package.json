@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
+    "sync": "tsc && node dist/sync.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -16,6 +18,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
+    "@inquirer/prompts": "^8.4.3",
     "commander": "^11.0.0",
     "csvtojson": "^2.0.10",
     "firebase-admin": "^11.10.1",
